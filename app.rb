@@ -19,14 +19,16 @@ configure do
 	(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		created_date DATE,
-		content TEXT
+		content TEXT,
+		username TEXT
 	)'
 	@db.execute 'CREATE TABLE IF NOT EXISTS Comments 
 	(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		created_date DATE,
 		content TEXT,
-		post_id integer
+		post_id integer,
+		username TEXT
 	)'
 end
 
@@ -41,16 +43,21 @@ end
 
 post '/new' do
 	content = params[:content]
+	username = params[:username]
 
-	if content.length <= 0
-		@error = 'Type text'
-		return erb :new
-	end
+	hh = {:username => 'Type your name', 
+    :content => 'Type text',}
 
-	@db.execute 'insert into Posts(content, created_date) values(?, datetime())', [content]
+    @error = hh.select {|key,_| params[key] == ''}.values.join(', ')
+
+    if @error != ''
+      return erb :new
+    end
+
+
+	@db.execute 'insert into Posts(content, created_date, username) values(?, datetime(),?)', [content,username]
 
 	redirect to '/'
-	erb "You typed #{content}"
 end
 
 get '/details/:post_id' do
@@ -67,18 +74,31 @@ end
 post '/details/:post_id' do
 	post_id = params[:post_id]
 	content = params[:content]
+	username = params[:username]
+
+	hh = {:username => 'Type your name', 
+    :content => 'Type text',}
+
+    @error = hh.select {|key,_| params[key] == ''}.values.join(', ')
+
+    if @error != ''
+       	return redirect to('/details/' + post_id)
+       	erb '<div class="alert alert-danger"><%=@error%></div>'
+    end
 
 	@db.execute 'insert into Comments
 	(
 		content, 
 		created_date, 
-		post_id
+		post_id,
+		username
 	) values
 	(
 		?, 
 		datetime(),
+		?,
 		?
-	)', [content, post_id]
+	)', [content, post_id, username]
 
 	redirect to('/details/' + post_id)
 end

@@ -1,23 +1,27 @@
-<h4>Post details:</h4>
-<p>
+<h3>Post details:</h3>
+<div>
+	<h4>Post # <%= @row['id']%></h4>
 	<%= @row['content']%>
-		<br/>
-		<br/>
-		Added at <%= @row['created_date']%>
-</p>
+	<br/>
+	<!-- Added at <%= @row['created_date']%> -->
+	<span style="font-size: 75%; color: #999">Added at <%= @row['created_date'] %> by <%= @row['username']%></span>
+</div>
 <br/ >
-<h4>Comments:</h4>
+<h3>Comments:</h3>
 <% @comments.each do |comment|%>
 	
 	<p>
 		<%= comment['content']%>
 		<br>
-		<span style="font-size: 75%; color: #999">Added at <%= comment['created_date'] %></span>
+		<span style="font-size: 75%; color: #999">Added at <%= comment['created_date'] %> by <%= comment['username']%></span>
 	</p>
 	<hr/>
 <%end%>
 <p>
 	<form action="/details/<%= @row['id'] %>" method="POST" role="form">
+		<p>Your name: </p>
+		<input type="text" name="username" class="form-control" placeholder="Name">
+		<br/>
 	    <textarea class="form-control" rows="6" placeholder="Type comment here" name="content"></textarea>
 	    <br/>
 	    <button type="submit" class="btn btn-primary">Add comment</button>
